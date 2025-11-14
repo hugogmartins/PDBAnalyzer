@@ -6,10 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+
 class Relatorio(ABC):
 
     def __init__(self, estrutura, destino_arquivos):
         self.estrutura = estrutura
+        self.destivo_arquivos = destino_arquivos
         self.__integralizacao(destino_arquivos)
 
     @abstractmethod
@@ -21,8 +23,8 @@ class Relatorio(ABC):
         pass
 
     def __integralizacao(self, destino_arquivos):
-        resultado = self._calcular()
-        destino_arquivos = self._plot(resultado, destino_arquivos)
+        self.resultado = self._calcular()
+        destino_arquivos = self._plot(self.resultado, destino_arquivos)
 
 class Ramachandran(Relatorio):
 
@@ -341,7 +343,6 @@ class PontesHidrogenio(Relatorio):
                 eixo1.set_yticklabels(rotulos_residuos, fontsize=6)
             
             pontes_por_residuo = np.sum(matriz, axis=1)
-            residuos_numeros = [info['residuo_numero'] for info in informacoes_residuos]
 
             barras = eixo2.bar(range(total_residues), pontes_por_residuo, color='lightcoral', edgecolor='darkred', alpha=0.7)
             eixo2.set_xlabel("Índice do Resíduo")
@@ -439,6 +440,7 @@ class Sasa(Relatorio):
 
             eixos[0, 0].plot(residuos_numeros, valores_sasa, 'b-', linewidth=1, alpha=0.7)
             eixos[0, 0].fill_between(residuos_numeros, valores_sasa, alpha=0.3)
+            eixos[0, 0].set_title("Distribuição de valores SASA.", fontweight='bold')
             eixos[0, 0].set_xlabel("Número do Resíduo.")
             eixos[0, 0].set_ylabel("SASA Å²")
             eixos[0, 0].grid(True, alpha=0.3)
@@ -448,7 +450,7 @@ class Sasa(Relatorio):
             eixos[0, 1].axvline(np.median(valores_sasa), color='green', linestyle='--', label=f"Mediana {np.median(valores_sasa):.2f} Å²")
             eixos[0, 1].set_xlabel("SASA Å²")
             eixos[0, 1].set_ylabel("Frequência")
-            eixos[0, 1].set_title("Distribuição de valores de SASA.")
+            eixos[0, 1].set_title("Distribuição de valores de SASA.", fontweight='bold')
             eixos[0, 1].legend()
             eixos[0, 1].grid(True, alpha=0.3)
 
@@ -459,7 +461,7 @@ class Sasa(Relatorio):
                     contador_acessibilidade[acessibilidade] = contador_acessibilidade.get(acessibilidade, 0) + 1
                 cores = ['lightcoral', 'gold', 'lightgreen']
                 eixos[1, 0].pie(contador_acessibilidade.values(), labels=contador_acessibilidade.keys(), autopct='%1.1f%%', colors=cores, startangle=90)
-                eixos[1, 0].set_title("Classificação de Acessibilidade dos Resíduos.")
+                eixos[1, 0].set_title("Classificação de Acessibilidade dos Resíduos.", fontweight='bold')
             
             residuos_tipos = {}
             for data in resultado:
@@ -477,7 +479,7 @@ class Sasa(Relatorio):
             barras = eixos[1, 1].bar(range(len(residuos_nomes)), residuos_medias, color='lightblue', edgecolor='black')
             eixos[1, 1].set_xlabel("Tipo de resíduo")
             eixos[1, 1].set_ylabel("SASA Média Å²")
-            eixos[1, 1].set_title("SASA Médio por tipo de Resíduo.")
+            eixos[1, 1].set_title("SASA Médio por tipo de Resíduo.", fontweight='bold')
             eixos[1, 1].set_xticklabels(residuos_nomes, rotation=45)
 
             for barra, valor in zip(barras, residuos_medias):
@@ -489,8 +491,38 @@ class Sasa(Relatorio):
             plt.savefig(destino_arquivo, dpi=300, bbox_inches='tight')
             plt.close()
 
-            print(f"Gráicos SASA salvos como: {destino_arquivo}")
+            print(f"Gráficos SASA salvos como: {destino_arquivo}")
             return destino_arquivo
 
         except Exception as e:
             raise ValueError(f"Erro ao gerar os gráficos SASA.")
+    
+class Conformacao3d(Relatorio):
+    def _calcular(self):
+        resultado = {}
+        return resultado
+
+    def _plot(self, resultado, destino):
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111, projection='3d')
+
+        for modelo in self.estrutura.estrutura:
+            for cadeia in modelo:
+                for residuo in cadeia:
+                    try:
+                        ca = residuo['CA']
+                        x, y, z = ca.get_coord()
+                        ax.scatter(x, y, z, c='blue', s=20)
+                    except KeyError:
+                        continue
+        
+        ax.set_title(f"Estrutura")
+        ax.set_xlabel('x (A)')
+        ax.set_ylabel('y (A)')
+        ax.set_zlabel('z (A)')
+
+        destino_arquivo = os.path.join(destino, f"estrutura.png")
+        plt.savefig(destino_arquivo, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        return destino_arquivo

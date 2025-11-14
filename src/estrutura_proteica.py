@@ -1,15 +1,14 @@
 from Bio.PDB import PDBParser, PPBuilder
 from Bio.SeqUtils import molecular_weight
 from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
-from relatorios import Ramachandran, MapaContato, PontesHidrogenio, Sasa
-import os
+from relatorios import Ramachandran, MapaContato, PontesHidrogenio, Sasa, Conformacao3d
 
 class Estrutura:
     def __init__(self, arquivo):
 
         self.arquivo = arquivo
-        try:        
-            self.estrutura = self.__carregamento_arquivo_proteina()
+        try:
+            self.estrutura, self.cabecalho = self.__carregamento_arquivo_proteina()
             self.modelos = list(self.estrutura.get_models())
 
             self.cadeias = []
@@ -25,14 +24,15 @@ class Estrutura:
             destino_arquivos = "results"
             self._gerar_graficos(destino_arquivos)
 
-        except Exception:
-            raise ValueError(f"* ERRO: Extração de metadados da proteína {self.arquivo}.")
+        except Exception as e:
+            raise ValueError(f"* ERRO: Extração de metadados da proteína {e}.")
 
     def __carregamento_arquivo_proteina(self):
         try:
             parser = PDBParser(QUIET=True)
             estrutura = parser.get_structure('protein', self.arquivo)
-            return estrutura
+            cabecalho = parser.get_header()
+            return estrutura, cabecalho
         
         except FileNotFoundError:
             raise FileNotFoundError(f"ERRO: Arquvio da proteína não encontrado {self.arquivo}.")
@@ -58,7 +58,7 @@ class Estrutura:
 
         except Exception:
             massa_molecular = len(sequencia_polipep_completa) * 110
-            print(f"ERRO: Cálculo da massa molecular. Será atribuido pelo tamanho da sequencia * {massa_molecular}")
+            print(f"ERRO: Cálculo da massa molecular. Será atribuido pelo tamanho da sequencia * {110}")
 
         return massa_molecular
     
@@ -78,21 +78,4 @@ class Estrutura:
         self.mapa_contato = MapaContato(self, destino)
         self.pontes_H = PontesHidrogenio(self, destino)
         self.sasa = Sasa(self, destino)
-    
-    def resumo_estrutural(self):
-        print("=" * 70)
-        print("RESUMO DA ESTRUTURA DA PROTEÍNA")
-        print(f"Número de modelos: {len(self.modelos)}")
-        print(f"Número de cadeias: {len(self.cadeias)}")
-        print(f"Número de resíduos: {len(self.residuos)}")
-        print(f"Número de átomos: {len(self.atomos)}\n")
-        print(f"Massa Molecular: {self.massa_molecular}")
-        print(f"Ponto isoelétrico: {self.ponto_isoeletrico}")
-        print("-" * 70)
-        
-        for contador, sequencia in enumerate(self.sequencias_polipeptidica):
-            visualizacao_sequencia = sequencia + "..." if len(sequencia) > 30 else sequencia
-            print(f"{contador + 1}º Sequência - Total: {len(sequencia)}\n{visualizacao_sequencia} resíduos.")
-            
-        print("-" * 70)
-        print("=" * 70)
+        self.conformacao = Conformacao3d(self, destino)
