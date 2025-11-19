@@ -54,7 +54,7 @@ class GeradorPDF:
             'Resíduos': str(len(self.estrutura.residuos)) + (' unidade.' if len(self.estrutura.residuos) == 1 else ' unidades.'),
             'Átomos' : str(len(self.estrutura.atomos)) + (' unidade.' if len(self.estrutura.atomos) == 1 else ' unidades.'),
             'Massa molecular': round(self.estrutura.massa_molecular, 2),
-            'Pontos isoelétricos': round(self.estrutura.ponto_isoeletrico, 2)
+            'Ponto isoelétrico': round(self.estrutura.ponto_isoeletrico, 2)
         }
 
         self.__criar_resumo_dados(ax, 0.4, resumo_estrutural)
