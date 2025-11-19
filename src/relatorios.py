@@ -11,7 +11,7 @@ class Relatorio(ABC):
 
     def __init__(self, estrutura, destino_arquivos):
         self.estrutura = estrutura
-        self.destivo_arquivos = destino_arquivos
+        self.destino_arquivos = destino_arquivos
         self.__integralizacao(destino_arquivos)
 
     @abstractmethod
