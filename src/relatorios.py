@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-
 class Relatorio(ABC):
 
     def __init__(self, estrutura, destino_arquivos):
@@ -77,8 +76,10 @@ class Ramachandran(Relatorio):
         angulos_phi = resultado['phi']
         angulos_psi = resultado['psi']
         try:
-            figura = plt.figure(figsize=(10, 8))
+            figura, eixo = plt.subplots(figsize=(10, 8))
+
             plt.scatter(angulos_phi, angulos_psi, alpha=0.6, s=20, c='blue', edgecolors='black', linewidths=0.5)
+            
             plt.xlim(-180, 180)
             plt.ylim(-180, 180)
 
@@ -95,7 +96,7 @@ class Ramachandran(Relatorio):
             plt.text(50, 50, "α-helix canhota", fontsize=12, color='red', alpha=0.7)
 
             os.makedirs(destino_arquivo, exist_ok=True)
-            destino_arquivo = os.path.join(destino_arquivo, "ramachandran.png")
+            destino_arquivo = os.path.join(destino_arquivo, f"{self.estrutura.cabecalho['idcode']}_ramachandran.png")
             plt.tight_layout()
             plt.savefig(destino_arquivo, dpi=300, bbox_inches='tight')
             plt.close(figura)
@@ -105,6 +106,7 @@ class Ramachandran(Relatorio):
         
         except Exception:
             raise ValueError("* ERRO: Criação do gráfico de Ramachandran.")
+        
         
 class MapaContato(Relatorio):
     def _calcular(self, limite_distancia=8.0):
@@ -179,7 +181,7 @@ class MapaContato(Relatorio):
         eixos.grid(True, which='both', color='lightgray', linestyle='-', linewidth=0.5, alpha=0.3)
 
         os.makedirs(destino_arquivo, exist_ok=True)
-        destino_arquivo = os.path.join(destino_arquivo, "mapa_contato.png")
+        destino_arquivo = os.path.join(destino_arquivo, f"{self.estrutura.cabecalho['idcode']}_mapa_contato.png")
         plt.tight_layout()
         plt.savefig(destino_arquivo, dpi=300, bbox_inches='tight')
         plt.close(figura)
@@ -319,7 +321,7 @@ class PontesHidrogenio(Relatorio):
         except Exception as e:
             raise ValueError(f"Erro ao criar matriz de ligações de H.")
 
-    def _plot(self, resultado, destino_arquivo="pontes_hidrogenio.png"):
+    def _plot(self, resultado, destino_arquivo="ligacoes_hidrogenio.png"):
         try:
             informacoes_residuos = resultado['informacoes_ordenadas']
             matriz = resultado['matriz']
@@ -330,7 +332,7 @@ class PontesHidrogenio(Relatorio):
             im = eixo1.imshow(matriz, cmap='Reds', interpolation='nearest', origin='lower')
             plt.colorbar(im, ax=eixo1, label="Ponte de Hidrogênio (1 = Presente, 0 = Ausente)")
 
-            eixo1.set_title("Matriz de pontes de Hidrogênio", fontsize=14, fontweight='bold')
+            eixo1.set_title("Matriz de ligações de Hidrogênio", fontsize=14, fontweight='bold')
             eixo1.set_xlabel("Índice do Resíduo")
             eixo1.set_ylabel("Índice do Resíduo")
             eixo1.grid(True, alpha=0.3)
@@ -346,7 +348,7 @@ class PontesHidrogenio(Relatorio):
 
             barras = eixo2.bar(range(total_residues), pontes_por_residuo, color='lightcoral', edgecolor='darkred', alpha=0.7)
             eixo2.set_xlabel("Índice do Resíduo")
-            eixo2.set_ylabel("Número de pontes de Hidrogênio")
+            eixo2.set_ylabel("Número de ligações de Hidrogênio")
             eixo2.set_title("Distribuição de ligações de H por Resíduo", fontsize=14, fontweight='bold')
             eixo2.grid(True, alpha=0.2)
 
@@ -357,7 +359,7 @@ class PontesHidrogenio(Relatorio):
                     barras[idx].set_color('red')
             
             os.makedirs(destino_arquivo, exist_ok=True)
-            destino_arquivo = os.path.join(destino_arquivo, "pontes_hidrogenio.png")
+            destino_arquivo = os.path.join(destino_arquivo, f"{self.estrutura.cabecalho['idcode']}_ligacoes_hidrogenio.png")
             plt.tight_layout()
             plt.savefig(destino_arquivo, dpi=300, bbox_inches='tight')
             plt.close()
@@ -486,7 +488,7 @@ class Sasa(Relatorio):
                 eixos[1, 1].text(barra.get_x() + barra.get_width() / 2, barra.get_height() + 0.5, f"{valor:.1f}", ha='center', fontsize=8)
             
             os.makedirs(destino_arquivo, exist_ok=True)
-            destino_arquivo = os.path.join(destino_arquivo, "distribuicao_sasa.png")
+            destino_arquivo = os.path.join(destino_arquivo, f"{self.estrutura.cabecalho['idcode']}_distribuicao_sasa.png")
             plt.tight_layout()
             plt.savefig(destino_arquivo, dpi=300, bbox_inches='tight')
             plt.close()
@@ -516,12 +518,12 @@ class Conformacao3d(Relatorio):
                     except KeyError:
                         continue
         
-        ax.set_title(f"Estrutura")
+        ax.set_title(f"Estrutura 3D dos carbonos alfa")
         ax.set_xlabel('x (A)')
         ax.set_ylabel('y (A)')
         ax.set_zlabel('z (A)')
 
-        destino_arquivo = os.path.join(destino, f"estrutura.png")
+        destino_arquivo = os.path.join(destino, f"{self.estrutura.cabecalho['idcode']}_estrutura.png")
         plt.savefig(destino_arquivo, dpi=150, bbox_inches='tight')
         plt.close()
 

@@ -7,19 +7,21 @@ class GeradorPDF:
     def __init__(self, estrutura, destino):
         self.estrutura = estrutura
         self.destino = destino
+        self.nome_molecula = self.estrutura.cabecalho['idcode']
         self.__gerar_pdf()
 
     def __gerar_pdf(self):
         try:
-            caminho_pdf = os.path.join(self.destino, "relatorio_estrutural.pdf")
+            caminho_pdf = os.path.join(self.destino, f"{self.nome_molecula}_relatorio_estrutural.pdf")
 
             with PdfPages(caminho_pdf) as pdf:
                 self.__criar_capa(pdf)
 
-                self.__adicionar_grafico(pdf, 'ramachandran.png', "Gráfico de Ramachandran", "Distribuição dos ângulos dihedrais Phi e Psi dos resíduos protéicos.")
-                self.__adicionar_grafico(pdf, 'mapa_contato.png', "Mapa de Contatos", "Matriz de contatos entre carbonos alfa.")
-                self.__adicionar_grafico(pdf, 'pontes_hidrogenio.png', "Rede de Pontes de Hidrogênio", "Matriz e distribuição de pontes de hidrogênio na estrutura.")
-                self.__adicionar_grafico(pdf, 'distribuicao_sasa.png', "Análise de Acessibilidade", "Distribuição da Área Superficial Acessível ao Solvente.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ramachandran.png', "Gráfico de Ramachandran", "Distribuição dos ângulos dihedrais Phi e Psi dos resíduos protéicos.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_mapa_contato.png', "Mapa de Contatos", "Matriz de contatos entre carbonos alfa.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ligacoes_hidrogenio.png', "Rede de Ligações de Hidrogênio", "Matriz e distribuição de ligações de hidrogênio na estrutura.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_distribuicao_sasa.png', "Análise de Acessibilidade", "Distribuição da Área Superficial Acessível ao Solvente.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_estrutura.png', "Gráfico 3D de posições de Carbonos Alfa", "")
 
                 return caminho_pdf
         except Exception:
@@ -30,7 +32,7 @@ class GeradorPDF:
         fig.patch.set_facecolor('white')
         ax.axis('off')
 
-        ax.text(0.5, 0.9, "Relatório PDBAnalyzer", ha='center', va='center', fontsize=16, fontweight='bold', transform=ax.transAxes)
+        ax.text(0.5, 0.9, f"Relatório PDBAnalyzer {self.nome_molecula}", ha='center', va='center', fontsize=16, fontweight='bold', transform=ax.transAxes)
 
         ax.text(0.1, 0.75, "Análise do arquivo:", ha='left', va='center', fontsize=12, fontweight='bold', transform=ax.transAxes)
 
