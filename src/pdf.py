@@ -55,7 +55,7 @@ class GeradorPDF:
             'Cadeias': str(len(self.estrutura.cadeias)) + (' unidade.' if len(self.estrutura.cadeias) == 1 else ' unidades.'),
             'Resíduos': str(len(self.estrutura.residuos)) + (' unidade.' if len(self.estrutura.residuos) == 1 else ' unidades.'),
             'Átomos' : str(len(self.estrutura.atomos)) + (' unidade.' if len(self.estrutura.atomos) == 1 else ' unidades.'),
-            'Massa molecular': round(self.estrutura.massa_molecular, 2),
+            'Massa molecular': str(round(self.estrutura.massa_molecular, 2)) + (' kDa.'),
             'Ponto isoelétrico': round(self.estrutura.ponto_isoeletrico, 2)
         }
 

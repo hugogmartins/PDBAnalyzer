@@ -60,7 +60,7 @@ class Estrutura:
             massa_molecular = len(sequencia_polipep_completa) * 110
             print(f"ERRO: Cálculo da massa molecular. Será atribuido pelo tamanho da sequencia * {110}")
 
-        return massa_molecular
+        return massa_molecular / 1000
     
     def __calculo_ponto_isoletrico(self, sequencia_polipep_completa):
         try:
