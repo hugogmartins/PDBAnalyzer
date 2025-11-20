@@ -482,7 +482,8 @@ class Sasa(Relatorio):
             eixos[1, 1].set_xlabel("Tipo de resíduo")
             eixos[1, 1].set_ylabel("SASA Média Å²")
             eixos[1, 1].set_title("SASA Médio por tipo de Resíduo.", fontweight='bold')
-            eixos[1, 1].set_xticklabels(residuos_nomes, rotation=45)
+            eixos[1, 1].set_xticks(range(len(residuos_nomes)))
+            eixos[1, 1].set_xticklabels(residuos_nomes, rotation=45, ha='right')
 
             for barra, valor in zip(barras, residuos_medias):
                 eixos[1, 1].text(barra.get_x() + barra.get_width() / 2, barra.get_height() + 0.5, f"{valor:.1f}", ha='center', fontsize=8)
