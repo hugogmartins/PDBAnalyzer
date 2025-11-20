@@ -4,6 +4,7 @@ from Bio.PDB.vectors import calc_dihedral
 from Bio.PDB import ShrakeRupley
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.image import imread
 import os
 
 class Relatorio(ABC):
@@ -75,8 +76,17 @@ class Ramachandran(Relatorio):
     def _plot(self, resultado, destino_arquivo="ramachandran.png"):
         angulos_phi = resultado['phi']
         angulos_psi = resultado['psi']
+
+        background_image_path = 'images/ramachandran_contour.png'
+        try:
+            background_img = imread(background_image_path)
+        except FileNotFoundError:
+            print(f"ERRO: Background image not found at '{background_image_path}'. Plotting without background.")
+            background_img = None
         try:
             figura, eixo = plt.subplots(figsize=(10, 8))
+            if background_img is not None:
+                eixo.imshow(background_img, extent=[-180, 180, -180, 180], aspect='auto', origin='upper')
 
             plt.scatter(angulos_phi, angulos_psi, alpha=0.6, s=20, c='blue', edgecolors='black', linewidths=0.5)
             
@@ -88,12 +98,12 @@ class Ramachandran(Relatorio):
             plt.grid(True, alpha=0.3)
 
             plt.title("Ramachandran", fontsize=16, fontweight='bold')
-            plt.xlabel("Ângulos PHI (°).", fontsize=12)
-            plt.ylabel("Ângulos PSI (°)", fontsize=12)
+            plt.xlabel("φ (°)", fontsize=14)
+            plt.ylabel("ψ (°)", fontsize=14)
 
-            plt.text(-150, -150, "β-sheet", fontsize=12, color='red', alpha=0.7)
-            plt.text(-100, 50, "α-helix", fontsize=12, color='red', alpha=0.7)
-            plt.text(50, 50, "α-helix canhota", fontsize=12, color='red', alpha=0.7)
+            plt.text(-150, -155, "fita β", fontsize=15, color='red', alpha=1, fontweight='bold')
+            plt.text(-100, 41, "α-hélice", fontsize=15, color='red', alpha=1, fontweight='bold')
+            plt.text(50, 70, "α-hélice canhota", fontsize=15, color='red', alpha=1, fontweight='bold')
 
             os.makedirs(destino_arquivo, exist_ok=True)
             destino_arquivo = os.path.join(destino_arquivo, f"{self.estrutura.cabecalho['idcode']}_ramachandran.png")

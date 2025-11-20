@@ -17,7 +17,7 @@ class GeradorPDF:
             with PdfPages(caminho_pdf) as pdf:
                 self.__criar_capa(pdf)
 
-                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ramachandran.png', "Gráfico de Ramachandran", "Distribuição dos ângulos dihedrais Phi e Psi dos resíduos protéicos.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ramachandran.png', "Gráfico de Ramachandran", "Distribuição dos ângulos dihedrais φ e ψ dos resíduos protéicos.")
                 self.__adicionar_grafico(pdf, f'{self.nome_molecula}_mapa_contato.png', "Mapa de Contatos", "Matriz de contatos entre carbonos alfa.")
                 self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ligacoes_hidrogenio.png', "Rede de Ligações de Hidrogênio", "Matriz e distribuição de ligações de hidrogênio na estrutura.")
                 self.__adicionar_grafico(pdf, f'{self.nome_molecula}_distribuicao_sasa.png', "Análise de Acessibilidade", "Distribuição da Área Superficial Acessível ao Solvente.")
