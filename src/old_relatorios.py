@@ -388,9 +388,6 @@ class Sasa(Relatorio):
         return resultado
         
     def __obter_sasa(self, circuferencia_sonda=1.4, n_pontos=100):
-        max_asa = {"ALA": 129.0, "ARG": 274.0, "ASN": 195.0, "ASP": 193.0, "CYS": 167.0, "GLU": 223.0, "GLN": 225.0,
-                   "GLY": 104.0, "HIS": 224.0, "ILE": 197.0, "LEU": 201.0, "LYS": 236.0, "MET": 224.0, "PHE": 240.0,
-                   "PRO": 159.0, "SER": 155.0, "THR": 172.0, "TRP": 285.0, "TYR": 263.0, "VAL": 174.0}
         try:
             shrake_rupley = ShrakeRupley(probe_radius=circuferencia_sonda, n_points=n_pontos)
             shrake_rupley.compute(self.estrutura.estrutura, level="R")
@@ -405,15 +402,13 @@ class Sasa(Relatorio):
                     if is_aa(residuo):
                         residuo_sasa = residuo.sasa
                         total_sasa += residuo_sasa
-                        relat_sasa = residuo_sasa / max_asa[residuo.resname]
 
                         dados_sasa.append({
                             'cadeia': cadeia.id,
                             'residuo': f"{residuo.resname} {residuo.id[1]}",
                             'residuo_numero': residuo.id[1],
                             'residuo_nome': residuo.resname,
-                            'sasa': residuo_sasa,
-                            'rasa': relat_sasa
+                            'sasa': residuo_sasa
                         })
             
             resultado = {
@@ -425,16 +420,19 @@ class Sasa(Relatorio):
         except Exception:
             raise ValueError(f"Erro ao calcular SASA.")
     
-    def __classificar_acessibilidade(self, resultado, metodo='rost-sander'):
+    def __classificar_acessibilidade(self, resultado, metodo='percentil'):
         try:
             dados = resultado['dados']
             valores_sasa = [dado['sasa'] for dado in dados]
-            if metodo == 'rost-sander':
+            if metodo == 'percentil':
+                percentil33 = np.percentile(valores_sasa, 33)
+                percentil66 = np.percentile(valores_sasa, 66)
+                
                 for dado in dados:
-                    if dado['rasa'] < 0.09:
+                    if dado['sasa'] <= percentil33:
                         dado['acessibilidade'] = 'Inacessível'
                         dado['classe'] = 0
-                    elif dado['rasa'] <= 0.36:
+                    elif dado['sasa'] <= percentil66:
                         dado['acessibilidade'] = 'Parcialmente Exposto'
                         dado['classe'] = 1
                     else:
