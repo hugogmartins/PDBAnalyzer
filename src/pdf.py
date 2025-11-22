@@ -64,12 +64,14 @@ class GeradorPDF:
         data = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         ax.text(0.5, 0.05, f'PDBAnalyzer - Data de geração: {data}', ha='center', va='center', fontsize=10, transform=ax.transAxes)
 
-        pdf.savefig(fig, bbox_inches='tight')
+        pdf.savefig(fig, bbox_inches='tight', dpi=300)
         plt.close()
     
     def __adicionar_grafico(self, pdf, nome_arquivo, titulo, descricao):
         caminho = os.path.join(self.destino, nome_arquivo)
         if os.path.exists(caminho):
+            plt.rcParams['pdf.compression'] = 0 #desabilita compressão para manter qualidade
+
             fig = plt.figure(figsize=(8.27, 11.69))
             fig.patch.set_facecolor('white')
 
@@ -81,7 +83,7 @@ class GeradorPDF:
 
             ax_grafico = plt.subplot(gs[1])
             img = plt.imread(caminho)
-            ax_grafico.imshow(img)
+            ax_grafico.imshow(img, rasterized=True) #evita processamentos internos que diminuem a qualidade da imagem
             ax_grafico.axis('off')
 
             ax_desc = plt.subplot(gs[2])
@@ -91,7 +93,7 @@ class GeradorPDF:
             data = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             ax_desc.text(0.5, 0.3, f'PDBAnalyzer - Data de geração: {data}', ha='center', va='center', fontsize=10, transform=ax_desc.transAxes)
 
-            pdf.savefig(fig, bbox_inches='tight')
+            pdf.savefig(fig, bbox_inches='tight', dpi=300)
             plt.close()
         
         else:

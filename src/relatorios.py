@@ -535,7 +535,7 @@ class Conformacao3d(Relatorio):
         ax.set_zlabel('z (A)')
 
         destino_arquivo = os.path.join(destino, f"{self.estrutura.cabecalho['idcode']}_estrutura.png")
-        plt.savefig(destino_arquivo, dpi=150, bbox_inches='tight')
+        plt.savefig(destino_arquivo, dpi=300, bbox_inches='tight')
         plt.close()
 
         return destino_arquivo
