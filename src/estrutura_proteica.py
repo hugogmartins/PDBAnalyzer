@@ -21,7 +21,7 @@ class Estrutura:
             self.massa_molecular = self.__calculo_massa_molecular(sequencia_polipep_completa)
             self.ponto_isoeletrico = self.__calculo_ponto_isoletrico(sequencia_polipep_completa)
 
-            destino_arquivos = "results"
+            destino_arquivos = "../results"
             self._gerar_graficos(destino_arquivos)
 
         except Exception as e:
@@ -60,7 +60,7 @@ class Estrutura:
             massa_molecular = len(sequencia_polipep_completa) * 110
             print(f"ERRO: Cálculo da massa molecular. Será atribuido pelo tamanho da sequencia * {110}")
 
-        return massa_molecular
+        return massa_molecular / 1000
     
     def __calculo_ponto_isoletrico(self, sequencia_polipep_completa):
         try:

@@ -17,7 +17,7 @@ class GeradorPDF:
             with PdfPages(caminho_pdf) as pdf:
                 self.__criar_capa(pdf)
 
-                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ramachandran.png', "Gráfico de Ramachandran", "Distribuição dos ângulos dihedrais Phi e Psi dos resíduos protéicos.")
+                self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ramachandran.png', "Gráfico de Ramachandran", "Distribuição dos ângulos dihedrais φ e ψ dos resíduos protéicos.")
                 self.__adicionar_grafico(pdf, f'{self.nome_molecula}_mapa_contato.png', "Mapa de Contatos", "Matriz de contatos entre carbonos alfa.")
                 self.__adicionar_grafico(pdf, f'{self.nome_molecula}_ligacoes_hidrogenio.png', "Rede de Ligações de Hidrogênio", "Matriz e distribuição de ligações de hidrogênio na estrutura.")
                 self.__adicionar_grafico(pdf, f'{self.nome_molecula}_distribuicao_sasa.png', "Análise de Acessibilidade", "Distribuição da Área Superficial Acessível ao Solvente.")
@@ -55,7 +55,7 @@ class GeradorPDF:
             'Cadeias': str(len(self.estrutura.cadeias)) + (' unidade.' if len(self.estrutura.cadeias) == 1 else ' unidades.'),
             'Resíduos': str(len(self.estrutura.residuos)) + (' unidade.' if len(self.estrutura.residuos) == 1 else ' unidades.'),
             'Átomos' : str(len(self.estrutura.atomos)) + (' unidade.' if len(self.estrutura.atomos) == 1 else ' unidades.'),
-            'Massa molecular': round(self.estrutura.massa_molecular, 2),
+            'Massa molecular': str(round(self.estrutura.massa_molecular, 2)) + (' kDa.'),
             'Ponto isoelétrico': round(self.estrutura.ponto_isoeletrico, 2)
         }
 
@@ -64,12 +64,14 @@ class GeradorPDF:
         data = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         ax.text(0.5, 0.05, f'PDBAnalyzer - Data de geração: {data}', ha='center', va='center', fontsize=10, transform=ax.transAxes)
 
-        pdf.savefig(fig, bbox_inches='tight')
+        pdf.savefig(fig, bbox_inches='tight', dpi=300)
         plt.close()
     
     def __adicionar_grafico(self, pdf, nome_arquivo, titulo, descricao):
         caminho = os.path.join(self.destino, nome_arquivo)
         if os.path.exists(caminho):
+            plt.rcParams['pdf.compression'] = 0 #desabilita compressão para manter qualidade
+
             fig = plt.figure(figsize=(8.27, 11.69))
             fig.patch.set_facecolor('white')
 
@@ -81,7 +83,7 @@ class GeradorPDF:
 
             ax_grafico = plt.subplot(gs[1])
             img = plt.imread(caminho)
-            ax_grafico.imshow(img)
+            ax_grafico.imshow(img, rasterized=True) #evita processamentos internos que diminuem a qualidade da imagem
             ax_grafico.axis('off')
 
             ax_desc = plt.subplot(gs[2])
@@ -91,7 +93,7 @@ class GeradorPDF:
             data = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             ax_desc.text(0.5, 0.3, f'PDBAnalyzer - Data de geração: {data}', ha='center', va='center', fontsize=10, transform=ax_desc.transAxes)
 
-            pdf.savefig(fig, bbox_inches='tight')
+            pdf.savefig(fig, bbox_inches='tight', dpi=300)
             plt.close()
         
         else:
